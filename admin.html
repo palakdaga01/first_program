@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ajneshwar Enterprises — Orders</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f6f2ea;color:#173628}
+header{padding:22px;background:#06331f;color:#fff}main{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 5px 20px #0001}
+.row{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.items{margin:12px 0;padding:12px;background:#faf8f3;border-radius:10px}.total{font-size:20px;font-weight:900}small{color:#68746e}
+</style></head>
+<body><header><strong>Ajneshwar Enterprises</strong> — Orders</header>
+<main><h2>Received Orders</h2><div id="orders">Loading…</div></main>
+<script>
+async function load(){
+  const res=await fetch("/api/orders"); const orders=await res.json();
+  const box=document.getElementById("orders");
+  if(!orders.length){box.innerHTML="<div class='card'>No orders yet.</div>";return;}
+  box.innerHTML=orders.map(o=>`
+    <div class="card">
+      <div class="row"><strong>${o.id}</strong><small>${new Date(o.createdAt).toLocaleString()}</small></div>
+      <p><b>${o.name}</b> · ${o.phone}</p><p>${o.address}</p>
+      ${o.note?`<p><small>Note: ${o.note}</small></p>`:""}
+      <div class="items">${o.items.map(i=>`<div class="row"><span>${i.name} × ${i.qty} kg</span><b>₹${i.amount}</b></div>`).join("")}</div>
+      <div>Subtotal: ₹${o.subtotal}</div><div>Delivery: ${o.delivery===0?"FREE":"₹"+o.delivery}</div>
+      <div>Payment: ${o.payment}</div><p class="total">Final Total: ₹${o.total}</p>
+    </div>`).join("");
+}
+load(); setInterval(load,10000);
+</script></body></html>
